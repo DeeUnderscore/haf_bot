@@ -20,7 +20,7 @@ from rickroll import make_call
 import json
 
 rfcs = json.load(open("rfcs.json", "r"))
-
+default_locale = "New York, NY"	# default location for the weather module
 
 def rfc (self, user, channel, args):
     try:
@@ -224,3 +224,14 @@ def say(self, user, channel, args):
     print user
     if user == "python_guy!~python_gu@184-106-220-104.static.cloud-ips.com":
         self.msg("#/r/nyc", args)
+
+import weather as weathermod
+def weather(self, user, channel, args):
+	"""Displayes weather data for given location."""
+	location = args if args else default_locale
+	
+	try:
+		weather_data = weathermod.get_weather(location)
+		self.msg(channel, "{location}: {temp}, {condition}".format(**weather_data))
+	except weathermod.InvalidLocale:
+		self.msg(channel, "Invalid location")

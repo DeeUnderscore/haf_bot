@@ -235,3 +235,9 @@ def weather(self, user, channel, args):
 		self.msg(channel, "{location}: {temp}, {condition}".format(**weather_data))
 	except weathermod.InvalidLocale:
 		self.msg(channel, "Invalid location")
+def gis(self, user, channel, args):
+	""" Google image search"""
+	
+	gis_url = "http://images.google.com/search?tbm=isch&q="
+	args = urllib2.quote(args)
+	self.msg(channel, gis_url + args)

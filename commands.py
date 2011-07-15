@@ -1,4 +1,4 @@
-__author__ = "pyton_guy"
+﻿__author__ = "pyton_guy"
 # ATTN: THIS MODULE IS DEPRECATED
 # leaving it here since help() hasn't been reimplemented yet
 

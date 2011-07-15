@@ -9,7 +9,7 @@ disconnect the bot from IRC to fix it. This bot is built for five-nines!
 """
 
 import re
-
+from modules.lib.database import db 
 
 # Various regular expressions for finding commands in messages
 # TODO: What characters are allowed in a nick?

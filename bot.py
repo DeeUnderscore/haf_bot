@@ -3,11 +3,16 @@ __author__ = "python_guy"
 
 from twisted.words.protocols import irc
 from twisted.internet import protocol
-import commands
 import triggers
 import thread
+import command_table
+import time
+from modules.lib.botconfig import config
 
-
+BOTCHANNEL = config.get("bot", "channel")
+BOTNICKNAME = config.get("bot", "nickname")
+BOTSERVER = config.get("bot", "server")
+BOTPORT = config.getint("bot", "port")
 
 class PythonBot(irc.IRCClient):
     """ An IRC bot for #/r/nyc on freenode. """
@@ -58,13 +63,16 @@ class PythonBot(irc.IRCClient):
 
             # Check for the reload command (which relods the commands module)
             if command == "reload":
-                reload(commands)
                 reload(triggers)
-                self.msg(channel, "Modules reloaded.")
-            # Try to get the command from commands.py
-            if hasattr(commands, command):
+                reload(command_table)
+                command_table.reload_modules()
+                self.msg(channel, "Config and modules reloaded.")
+            command_funct = None
+            # try to look the command up in command_table first
+            if command in command_table.table:
+                command_funct = command_table.table[command]
                 # Run the command if it exists
-                thread.start_new_thread(getattr(commands, command),(self, user, channel, args))
+                thread.start_new_thread(command_funct,(self, user, channel, args))
 
 
         # Check for silent triggers
@@ -92,12 +100,11 @@ class PythonBot(irc.IRCClient):
 
 
 
-
-
 class PythonBotFactory(protocol.ClientFactory):
     protocol = PythonBot
+    
 
-    def __init__(self, channel, nickname="cobra_bot"):
+    def __init__(self, channel, nickname=BOTNICKNAME):
         self.channel = channel
         self.nickname = nickname
 
@@ -107,6 +114,8 @@ class PythonBotFactory(protocol.ClientFactory):
 
     def clientConnectionFailed(self, connector, reason):
         print "Could not connect: %s" % (reason,)
+        time.sleep(30)
+        connector.connect()
 
 
 import sys
@@ -117,18 +126,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         chan = sys.argv[1]
     else:
-        chan = "#/r/nyc-test"
-
-    # Connect to the DB
-    print "Connecting to database..."
-    from pymongo import Connection
-    connection = Connection()
-    db = connection.rnyc_irc
-    # TODO: Kinda lame
-    commands.db = db
-    triggers.db = db
+        chan = BOTCHANNEL
 
     # Start the bot
     print "Connecting to IRC..."
-    reactor.connectTCP("irc.freenode.net", 6667, PythonBotFactory(chan))
+    reactor.connectTCP(BOTSERVER, BOTPORT, PythonBotFactory(chan))
     reactor.run()

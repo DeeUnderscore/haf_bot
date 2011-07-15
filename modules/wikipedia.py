@@ -7,8 +7,9 @@ Licensed under the Eiffel Forum License 2.
 http://inamidst.com/phenny/
 """
 
-import re, urllib
+import re, urllib, urllib2
 import web
+import json
 
 wikiuri = 'http://en.wikipedia.org/wiki/%s'
 wikisearch = 'http://en.wikipedia.org/wiki/Special:Search?' \
@@ -139,4 +140,53 @@ def wikipedia(term, last=False):
    term = term.decode('utf-8').encode('utf-8')
    return sentence + ' - ' + (wikiuri % term)
 
+
+#
+# haf_bot module follows
+# 
+
+def wiki(self, user, channel, args): 
+    if not args:
+        self.msg(channel, "Usage !wiki <article>")
+    else:
+        origterm = args
+        origterm = origterm.encode('utf-8')
+
+        term = urllib2.unquote(origterm)
+        term = term[0].upper() + term[1:]
+        term = term.replace(' ', '_')
+
+        try: result = wikipedia(term)
+        except IOError: 
+            error = "Can't connect to en.wikipedia.org (%s)" % (wikiuri % term)
+            self.msg(channel, error)
+            return
+
+        if result is not None: 
+            self.msg(channel, result)
+        else: self.msg(channel, 'Can\'t find anything in Wikipedia for "%s".' % origterm)
+
+# this uses wiktionary and not wikipedia, but it's tangentially related so it 
+# might as well go here 
+def define(self, user, channel, args):
+    """ Defines a word using the Wiktionary API """
+    if args:
+        data = json.load(urllib2.urlopen(
+            "http://en.wiktionary.org/w/api.php?format=json&action=query&prop=revisions&rvprop=content&titles=%s" % args))
+        innerdata = data["query"]["pages"]
+        if "-1" in innerdata:
+            self.msg(channel, "No definition found.")
+            return
+        for key in innerdata:
+            string = innerdata[key]["revisions"][0]["*"]
+            result = re.findall(".*#.*", string)
+            defs = len(result)
+            formatted = re.sub("# ", "", re.sub("{.*}\s", "", result[0]))
+            formatted = str(formatted.replace('[', '').replace(']', ''))
+            self.msg(channel,
+                     "%s - %s (Found %i definitions at http://en.wiktionary.org/wiki/%s)" % (
+                     args, formatted, defs, args))        
+
+from BotModule import BotModule      
+bot_modules = [BotModule({"wiki": wiki, "define": define})]
 

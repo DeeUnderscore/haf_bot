@@ -79,16 +79,14 @@ def reply_twit(self, user, channel, args):
             self.msg(channel, "{0}: Could not find twit id to reply to.".format(nick))
             return 
             
-    # show requires GET so we don't need to send twenty different tokens here
-    url = base_url + "statuses/show/" + tid + ".json"
-    
-    try:
-        content = urllib2.urlopen(url)
-    except urllib2.HTTPError:
-        self.msg(channel, "{0}: Could not find the twit I'm supposed to be replying to. Check id.".format(nick))
+    # Even though this does not require auth, we get higher rate limits if we
+    # auth. Just in case someone wants to post more than 150 replies in an hour.
+    url = base_url + "statuses/show.json?id=" + tid
+    resp, content = twit_request(url, {}, 'GET')
+    if resp['status'] != "200":
+        self.msg(channel, "{0}: Could not find the twit with id {1}.".format(nick, tid))
         return
-    
-    jcontent = json.load(content)
+    jcontent = json.loads(content)
     reply_to = '@' + jcontent['user']['screen_name']
         
     # Twitter will disregard the reply to field if the name of the addressee is 
@@ -110,13 +108,10 @@ def reply_twit(self, user, channel, args):
         status_url = "https://twitter.com/{0}/status/{1}".format(account, jcontent["id_str"])
         self.msg(channel, "Reply posted: {0} ({1})".format(jcontent["text"].encode("utf-8"), status_url))
 
-def twit_request(url, args):
+def twit_request(url, args, method="POST"):
     """Handler for twitter requests"""
     
-    # append stuff and things
-    args['oauth_version'] = "1.0"
-    args['oauth_nonce'] = oauth.generate_nonce()
-    args['oauth_timestamp'] = int(time.time())
+
     req_body = urllib.urlencode(args)
     
     consumer = oauth.Consumer(key=consumer_key, secret=consumer_secret)
@@ -124,8 +119,7 @@ def twit_request(url, args):
     client = oauth.Client(consumer, token)
     
     
-    resp, content = client.request(url, method="POST", body=req_body)
-    
+    resp, content = client.request(url, method, body=req_body)
     return (resp, content)
     
     

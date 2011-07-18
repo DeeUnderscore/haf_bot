@@ -24,7 +24,6 @@ def karma (self, user, channel, args):
         bottom_5 = all[-5:]
         karmaValues = lambda y: ", ".join(["%s(%s)" % (x["nick"], int(x["karma"])) for x in y])
         karma_text = "Top 5: %s | Bottom 5: %s" % (karmaValues(top_5), karmaValues(bottom_5))
-        karma_text = karma_text.replace("<random>", str(random.randint(-1000, 1000)))
     
     self.msg(channel, str(karma_text))
     

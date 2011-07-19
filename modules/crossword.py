@@ -7,7 +7,7 @@ from BotModule import BotModule
 from datetime import date, timedelta
 
 
-def crossword(self, user, channel, args):
+def crossword_funct(self, user, channel, args):
     """ Respons with a URL to Today's NYT crossword """
     if args and args.count("puz") > 0:
         folder="puzs"
@@ -21,4 +21,4 @@ def crossword(self, user, channel, args):
     )
     self.msg(channel, "http://jacobshufro.com/xwords/%s/%s" % (folder, filename))
 
-bot_modules = [BotModule({"crossword": crossword})]
+crossword = BotModule({"crossword": crossword_funct})

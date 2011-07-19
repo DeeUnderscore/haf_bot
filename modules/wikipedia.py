@@ -60,7 +60,7 @@ def search(term):
       return uri[len('http://en.wikipedia.org/wiki/'):]
    else: return term
 
-def wikipedia(term, last=False): 
+def wikipedia_lookup(term, last=False): 
    global wikiuri
    if not '%' in term: 
       if isinstance(term, unicode): 
@@ -76,14 +76,14 @@ def wikipedia(term, last=False):
       r = r_redirect.search(bytes[:4096])
       if r: 
          term = urllib.unquote(r.group(1))
-         return wikipedia(term, last=True)
+         return wikipedia_lookup(term, last=True)
 
    paragraphs = r_paragraph.findall(bytes)
 
    if not paragraphs: 
       if not last: 
          term = search(term)
-         return wikipedia(term, last=True)
+         return wikipedia_lookup(term, last=True)
       return None
 
    # Pre-process
@@ -116,7 +116,7 @@ def wikipedia(term, last=False):
    if not m: 
       if not last: 
          term = search(term)
-         return wikipedia(term, last=True)
+         return wikipedia_lookup(term, last=True)
       return None
    sentence = m.group(0)
 
@@ -131,7 +131,7 @@ def wikipedia(term, last=False):
     or ('or add a request for it' in sentence)): 
       if not last: 
          term = search(term)
-         return wikipedia(term, last=True)
+         return wikipedia_lookup(term, last=True)
       return None
 
    sentence = '"' + sentence.replace('"', "'") + '"'
@@ -156,7 +156,7 @@ def wiki(self, user, channel, args):
         term = term[0].upper() + term[1:]
         term = term.replace(' ', '_')
 
-        try: result = wikipedia(term)
+        try: result = wikipedia_lookup(term)
         except IOError: 
             error = "Can't connect to en.wikipedia.org (%s)" % (wikiuri % term)
             self.msg(channel, error)
@@ -188,5 +188,5 @@ def define(self, user, channel, args):
                      args, formatted, defs, args))        
 
 from BotModule import BotModule      
-bot_modules = [BotModule({"wiki": wiki, "define": define})]
+wikipedia = BotModule({"wiki": wiki, "define": define})
 

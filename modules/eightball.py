@@ -7,7 +7,7 @@ Provides a simple eightball thingy
 from BotModule import BotModule
 import random
 
-def eightball(self, user, channel, args):
+def eightball_funct(self, user, channel, args):
 	responses=["It is certain",
 	           "It is decidedly so",
 	           "Without a doubt",
@@ -34,4 +34,5 @@ def eightball(self, user, channel, args):
 	user_nick = user.split("!", 1)[0]
 	self.msg(channel, "{0}: {1}".format(user_nick, response))
 	
-bot_modules = [BotModule({"8ball": eightball})]
+eightball = BotModule({'8ball': eightball_funct})
+

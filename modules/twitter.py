@@ -123,5 +123,5 @@ def twit_request(url, args, method="POST"):
     return (resp, content)
     
     
-bot_modules = [BotModule({"twit": twit, "twit.reply": reply_twit})]
+twitter = BotModule({"twit": twit, "twit.reply": reply_twit})
 print "Twit module loaded."

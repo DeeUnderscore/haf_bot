@@ -45,4 +45,4 @@ def translate(self, user, channel, args):
                  "Usage: !translate <phrase to be translated into english>")
 
 
-bot_modules = [BotModule({"g": google, "gis": gis, "translate": translate})]
+google = BotModule({"g": google, "gis": gis, "translate": translate})

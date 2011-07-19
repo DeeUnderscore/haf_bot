@@ -3,7 +3,7 @@ import urllib2
 import json
 from datetime import date, time
 
-def reddit(self, user, channel, args):
+def reddit_funct(self, user, channel, args):
     if args:
         uname = args
     else:
@@ -44,4 +44,4 @@ def reddit(self, user, channel, args):
         # Happens when the data is malformed, and we can't get what we want from the JSON
         self.msg(channel, "Reddit broke :(")
         
-bot_modules = [BotModule({"reddit": reddit})]
+reddit = BotModule({"reddit": reddit_funct})

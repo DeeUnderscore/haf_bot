@@ -286,6 +286,6 @@ table = {}
 table["lastfm.register"] = register_nickname
 table["np"] = now_playing
 table["compare"] = compare
-bot_modules = [BotModule(table)]
+lastfm = BotModule(table)
 del table
 print "Last.fm module loaded"

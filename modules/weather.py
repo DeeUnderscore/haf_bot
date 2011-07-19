@@ -16,7 +16,7 @@ weather_url = "http://www.google.com/ig/api?weather="
 
 
 
-def weather(self, user, channel, args):
+def display_weather(self, user, channel, args):
 	"""Displayes weather data for given location."""
 
 	location = args if args else default_locale
@@ -50,5 +50,5 @@ class InvalidLocale(Exception):
 	pass
 
 
-bot_modules = [BotModule({"weather": weather})]
+weather = BotModule({"weather": display_weather})
 

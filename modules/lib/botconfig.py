@@ -3,7 +3,6 @@ Handles parsing of the config file
 """
 
 import ConfigParser
-import os
 
 config = ConfigParser.SafeConfigParser()
 

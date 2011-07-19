@@ -69,8 +69,9 @@ class PythonBot(irc.IRCClient):
                 self.msg(channel, "Config and modules reloaded.")
             command_funct = None
             # try to look the command up in command_table first
-            if command in command_table.table:
-                command_funct = command_table.table[command]
+            if command in command_table.ctable.table:
+                print "I GOT HERE"
+                command_funct = command_table.ctable.table[command]
                 # Run the command if it exists
                 thread.start_new_thread(command_funct,(self, user, channel, args))
 

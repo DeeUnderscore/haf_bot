@@ -5,8 +5,11 @@ Provides support for upvoting and downvoting people on IRC
 """
 from lib.database import db
 from BotModule import BotModule
+import re
 
-def karma (self, user, channel, args):
+karma_regex = re.compile("([\w-]+)(\+\+|--)", re.M)
+
+def karma_funct (self, user, channel, args):
     """ Responds with a list of karma records. """
 
     # Check for any sub-commands (like merge)
@@ -27,6 +30,27 @@ def karma (self, user, channel, args):
     
     self.msg(channel, str(karma_text))
     
-# TODO: Integrate triggers with the module system so we can have that code here
+def karma_trigger(self, user, channel, args, match):
+    """
+    Trigger for increasing or decreasing karmas
+    """
+    # Disable karma from PMs
+    if not channel.startswith("#"):
+        return
 
-bot_modules = [BotModule({"karma": karma})]
+    # Karma Trigger
+    # We need to apply the regex again since triggers match only once
+    for nick, points in karma_regex.findall(args):
+        # (I resisted the urge to make it a one-liner)
+        if points == "++":
+            points = +1
+        else:
+            points = -1
+        
+        # This is an upsert 
+        db.karma.update({"nick": nick}, {"$inc": {"karma": points}}, upsert=True)
+
+trigger_tuple = (karma_regex, karma_trigger)
+
+karma = BotModule( commands={"karma": karma_funct},
+                   triggers={"karma": trigger_tuple} )

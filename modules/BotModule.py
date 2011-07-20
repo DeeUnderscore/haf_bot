@@ -12,7 +12,6 @@ class BotModule:
         # unique identifier. The value is a tuple of a compiled regex used to 
         # find matches and a function to apply to the irc message when a 
         # match is found 
-        print triggers
         self.triggers = triggers
         
         self.active = False

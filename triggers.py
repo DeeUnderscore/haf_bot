@@ -9,8 +9,7 @@ disconnect the bot from IRC to fix it. This bot is built for five-nines!
 """
 
 import re
-from command_table import triggers, ctable, help
-
+from command_table import triggers
 
 def process_message (self, user, channel, msg):
     """ 
@@ -19,8 +18,6 @@ def process_message (self, user, channel, msg):
     """
     
     trigger_table = triggers.table
-    print triggers.table
-    print triggers.table.values()
     for trigger in trigger_table.values():
         # trigger[0] is the regex to match
         match = re.search(trigger[0], msg)

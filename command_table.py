@@ -45,6 +45,7 @@ def load_modules():
         except ImportError:
             # something fudged up on import
             print "Error when importing {0}, module not loaded.".format(name)
+            raise
         except (AttributeError, TypeError):
             # module is something other than a proper bot module
             print "Error when importing {0}: invalid module.".format(name)
@@ -89,8 +90,8 @@ class TableHandler:
         """
         Removes a specific command
         """
-        del self.table[command]
-        
+        if command in self.table:
+            del self.table[command]
 
 # we keep our own list of imported modules for later reloading
 modules = []

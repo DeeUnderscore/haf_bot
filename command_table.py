@@ -1,9 +1,8 @@
 """
 Provides a static lookup table for command names
 
-Since command names have to adhere to python naming rules, this variable is 
-provided so that we can use arbitrary strings for commands in the actual
-irc channel.
+Provides lookup tables for triggers and commands and facilities for loading and
+reloading of bot modules.
 """
 
 import modules.lib.botconfig as botconfig
@@ -14,10 +13,12 @@ def load_modules():
     """Used for reloading of imported modules"""
     
     # A note about implementation:
-    # Since the way that bot.py is designed to use global functions, we use the
-    # module objects as a way of storing references to those functions (instead
-    # of having them be class functions). Perhaps at a later date, the bot could
-    # be rewritten to use subclasses that contain methods for a more oopish approach
+    # Each module file must contain a BotModule object with the same name as the
+    # name of the module. We call on that object's install method, passing it
+    # the table handlers. By default, the object will just append its command
+    # tables to the tables within the handlers. BotModule can be subclassed,
+    # however, and the install() method overridden for dynamic registration
+    # of triggers and commands, etc. 
     
     global modules
     
@@ -96,7 +97,7 @@ class TableHandler:
 # we keep our own list of imported modules for later reloading
 modules = []
 ctable = TableHandler()
-help = TableHandler()
+help = TableHandler()   # note that help is as of yet unimplemented
 triggers = TableHandler()
 
 # for reloads, we did not do from...import

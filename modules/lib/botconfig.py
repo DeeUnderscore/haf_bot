@@ -11,4 +11,5 @@ try:
     config.readfp(cfg_file)
 except IOError:
     print "Cannot open config file."
-    raise
+finally:
+    cfg_file.close()

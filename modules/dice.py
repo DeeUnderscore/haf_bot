@@ -11,7 +11,8 @@ def roll_dice(self, user, channel, args):
         match = re.search("(\d+)d(\d+)", args)
         if match:
             dice = int(match.group(1))
-            sides = int(match.group(2))
+            # 0-sided dice break the universe
+            sides = (lambda x: x if x>0 else 6)(int(match.group(2)))
         else:
             dice = 1
             sides = 6

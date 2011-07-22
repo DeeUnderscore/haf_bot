@@ -25,7 +25,7 @@ class OmegleChat:
         self.handlers = []
         self.terminated = False
 
-        self.debug = True
+        self.debug = False
         
         jar = cookielib.CookieJar()
         processor = urllib2.HTTPCookieProcessor(jar)

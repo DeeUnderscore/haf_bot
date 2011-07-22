@@ -1,6 +1,7 @@
 import BotModule
 import lib.omegle as libomegle
 import re
+import threading
 
 class OmegleModule(BotModule.BotModule):
     """
@@ -13,15 +14,22 @@ class OmegleModule(BotModule.BotModule):
         start_command = {"omegle": self.omegle_start}
         BotModule.BotModule.__init__(self, commands=start_command)
         self.running = False
+        self.launch_lock = threading.Lock()
     
     def omegle_start(self, bot, user, channel, args):
         """
         Starts the omegle bot
         """
+        # this should prevent race conditions
+        self.launch_lock.acquire()
         if self.running:
-            # This should never be reached
             bot.msg(channel, "Omegle bot already running.")
+            self.launch_lock.release()
             return
+        
+        self.running = True
+        self.command_handler.deregister_entry("omegle")
+        self.launch_lock.release()
             
         if "p" in args:
             bot.msg(channel, "Omegle bot starting in PROMISCUOUS mode. Everything said in channel will be sent to Omegle. (commands: o.next, o.stop)")
@@ -30,7 +38,6 @@ class OmegleModule(BotModule.BotModule):
             bot.msg(channel, "Omegle bot starting in EXPLICIT mode. To send to omegle, use '!o <message>'. (commands: o.next, o.stop)")
             self.promiscuous = False
             
-        self.command_handler.deregister_entry("omegle")
         self.handler = HafHandler(bot, channel, self)
         self.spawn_chat()
             
@@ -49,7 +56,6 @@ class OmegleModule(BotModule.BotModule):
         else:
             self.command_handler.register_entry({"o": self.omegle_send})
             
-        self.running = True
         self.omegle_bot.connect(True)
             
     def clean_up(self):

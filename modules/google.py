@@ -7,6 +7,7 @@ Provides commands for accessing several Google services
 
 from BotModule import BotModule
 import urllib2
+import json
 
 def gis(self, user, channel, args):
 	""" Google image search"""

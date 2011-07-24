@@ -20,6 +20,9 @@ class OmegleModule(BotModule.BotModule):
         """
         Starts the omegle bot
         """
+        if not channel.startswith("#"):
+            return
+        
         # this should prevent race conditions
         self.launch_lock.acquire()
         if self.running:

@@ -1,9 +1,12 @@
 """
 Database connection for other modules to import as needed
 """
+import pymongo
+from botconfig import config
 
+dbname = config.get("bot", "dbname")
 # Connect to the DB
 print "Connecting to database..."
-import pymongo
+
 connection = pymongo.Connection()
-db = connection.rnyc_irc
+db = connection[dbname]

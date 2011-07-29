@@ -276,7 +276,7 @@ def readable_tdelta(other_time):
 				delta_string += ", "
 			delta_string += (str(minutes) + " minute")
 			delta_string += "s" if minutes > 1 else ""
-		else:
+		elif hours < 1:
 			delta_string += str(seconds) + " second"
 			delta_string += "s" if seconds > 1 else ""
 			

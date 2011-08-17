@@ -9,6 +9,7 @@ import time
 import urllib, urllib2
 import json
 import re
+import csv
 from lib.botconfig import config
 from BotModule import BotModule
 
@@ -107,6 +108,34 @@ def reply_twit(self, user, channel, args):
         jcontent = json.loads(content)
         status_url = "https://twitter.com/{0}/status/{1}".format(account, jcontent["id_str"])
         self.msg(channel, "Reply posted: {0} ({1})".format(jcontent["text"].encode("utf-8"), status_url))
+        
+        
+def dump_twits(filename="twits.csv", since=None):
+    """
+    Dumps all twits to a csv file in an {id}:{tweet} format.
+    """
+    
+    writer = csv.writer(open(filename, 'ab'), delimiter=':')
+    
+    args = {"screen_name": account, "count": 200, "trim_user": "true"}
+    if since:
+        args["since"] = since
+
+    url = base_url + "statuses/user_timeline.json?" + urllib.urlencode(args)
+    resp, content = twit_request(url, {}, 'GET')
+    if resp['status'] != "200":
+        raise Exception('Twitter did not respond properly to request.')
+    
+    content = json.loads(content)
+    
+    # old first
+    content.reverse()
+    
+    for entry in content:
+        writer.writerow((entry["id"], entry["text"].encode("utf-8")))
+    
+    
+    
 
 def twit_request(url, args, method="POST"):
     """Handler for twitter requests"""

@@ -10,4 +10,4 @@ def fuck(self, user, channel, args):
     fucks = urllib2.urlopen('http://rage.thewaffleshop.net/').read()
     self.msg(channel, fucks)
     
-misc = BotModule({'fuck': fuck})
+misc = BotModule(commands={'fuck': fuck})

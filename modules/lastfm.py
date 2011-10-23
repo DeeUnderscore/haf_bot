@@ -42,10 +42,18 @@ def register_nickname(self, user, channel, args):
 	notify = {}
 	notify["nick"] = irc_name
 	notify["lastfm"] = args
-	notify["fullname"] = data.getElementsByTagName("realname")[0].firstChild.data
+	# The full name field may be nonexistent
+	if(data.getElementsByTagName("realname")[0].firstChild): 
+		notify["fullname"] = data.getElementsByTagName("realname")[0].firstChild.data
+	else:
+		notify["fullname"] = None
 	notify["url"] = data.getElementsByTagName("url")[0].firstChild.data
-	self.msg(channel,
-	         "{nick} is now mapped to {lastfm} ({fullname}, {url})".format(**notify))	
+	
+	message = "{nick} is now mapped to {lastfm} ".format(**notify)
+	message += "({fullname}, {url})".format(**notify) \
+	           if notify["fullname"] != None else \
+	           "({url})".format(**notify)
+	self.msg(channel, message)	
 		
 def now_playing(self, user, channel, args):
 	"""Displays currently playing track, or last played track"""
@@ -207,7 +215,7 @@ def lfm_call(args):
 	# and handle it in the calling function. Can this break? Probably.
 	except urllib2.HTTPError, error:
 		data = error
-
+	
 	return data
 
 def lookup_name(name):
